@@ -39,3 +39,26 @@ readQueryExplorerData <- function(filename, colNames, addDateCols = FALSE) {
   data <- data[order(Date)]
   return(data)
 }
+
+completeGADates <- function(data, limitDates = NULL, replaceNA = 0) {
+  # Complete the dataset with the missing date so it contains all the dates within the range
+  if (is.null(limitDates))
+    daysToComplete <- data.frame(Date = seq(min(data$Date), max(data$Date), by = "day"))
+  else
+    daysToComplete <- data.frame(Date = seq(min(as.Date(limitDates)), max(as.Date(limitDates)), by = "day"))
+  data <- as.data.table(merge(daysToComplete, data, by = "Date", all.x = TRUE))
+  # Replace NA values
+  data[is.na(Users)]$Users <- replaceNA
+  data[is.na(UsersOld)]$UsersOld <- replaceNA
+  data[is.na(Sessions)]$Sessions <- replaceNA
+  data[is.na(AvgSessionDuration)]$AvgSessionDuration <- replaceNA
+  data[is.na(Pageviews)]$Pageviews <- replaceNA
+  data[is.na(PageviewsSession)]$PageviewsSession <- replaceNA
+  data[is.na(UniquePageviews)]$UniquePageviews <- replaceNA
+  data[is.na(AvgTimeOnPage)]$AvgTimeOnPage <- replaceNA
+  data[is.na(SessionsNew)]$SessionsNew <- replaceNA
+  data[is.na(SessionsOld)]$SessionsOld <- replaceNA
+  data[is.na(SessionsBounce)]$SessionsBounce <- replaceNA
+  data[is.na(SessionsNoBounce)]$SessionsNoBounce <- replaceNA
+  return(data)
+}
