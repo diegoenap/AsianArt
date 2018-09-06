@@ -1,0 +1,31 @@
+https://ga-dev-tools.appspot.com/query-explorer/?start-date=2012-11-12&end-date=today&metrics=ga%3Ausers%2Cga%3AnewUsers%2Cga%3ApercentNewSessions%2Cga%3Asessions%2Cga%3AbounceRate%2Cga%3AavgSessionDuration%2Cga%3Apageviews%2Cga%3ApageviewsPerSession%2Cga%3AuniquePageviews%2Cga%3AavgTimeOnPage&dimensions=ga%3Adate&samplingLevel=HIGHER_PRECISION&max-results=10000
+
+
+https://ga-dev-tools.appspot.com/query-explorer/?start-date=2016-01-06&end-date=today&metrics=ga%3Ausers%2Cga%3AnewUsers%2Cga%3ApercentNewSessions%2Cga%3Asessions%2Cga%3AbounceRate%2Cga%3AavgSessionDuration%2Cga%3Apageviews%2Cga%3ApageviewsPerSession%2Cga%3AuniquePageviews%2Cga%3AavgTimeOnPage&dimensions=ga%3Adate%2Cga%3AchannelGrouping&filters=ga%3Acountry%3D%3DUnited%20States%3Bga%3Acity%3D%3DSan%20Francisco&samplingLevel=HIGHER_PRECISION&max-results=10000
+
+ga:country!=United States
+ga:country==United States
+ga:country==United States;ga:city!=San Francisco
+ga:country==United States;ga:city==San Francisco
+
+
+ga:pagePath==/visit/visit
+ga:pagePath==/visit/visit;ga:country!=United States
+ga:pagePath==/visit/visit;ga:country==United States
+ga:pagePath==/visit/visit;ga:country==United States;ga:city!=San Francisco
+ga:pagePath==/visit/visit;ga:country==United States;ga:city==San Francisco
+
+ga:pagePath==/visit/plan-your-visit
+ga:pagePath==/visit/plan-your-visit;ga:country!=United States
+ga:pagePath==/visit/plan-your-visit;ga:country==United States
+ga:pagePath==/visit/plan-your-visit;ga:country==United States;ga:city!=San Francisco
+ga:pagePath==/visit/plan-your-visit;ga:country==United States;ga:city==San Francisco
+
+
+ga:pagePath==/visit/ticketing
+ga:pagePath==/visit/ticketing;ga:country!=United States
+ga:pagePath==/visit/ticketing;ga:country==United States
+ga:pagePath==/visit/ticketing;ga:country==United States;ga:city!=San Francisco
+ga:pagePath==/visit/ticketing;ga:country==United States;ga:city==San Francisco
+
+
