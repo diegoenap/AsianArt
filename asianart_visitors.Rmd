@@ -1,0 +1,80 @@
+---
+title: "Asian Art Museum - Visitors"
+author: "Diego Enriquez"
+date: "9/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+suppressMessages(library(data.table))
+suppressMessages(library(lubridate))
+suppressMessages(library(ggplot2))
+suppressMessages(library(grid))
+
+# Functions ==================================================================================================================================
+source("asianart_func.R")
+```
+
+## Asian Art Museum visitors by year
+
+The blue dashed lines delimit each month. The red dotted lines show the first Sunday of each month where the museum offer free access, and the number of visits is very high. Red dots show every Sunday showing that on normal weeks Sundays usually don't have the highest number of visitors.
+
+```{r echo=FALSE, warning=FALSE}
+asianart_visitors <- readVisitorData()
+asianart_visitors <- asianart_visitors[Date >= "2016-01-01"]
+
+daysinfo <- data.table(Date = seq(as.Date("2016-01-01"), as.Date("2018-06-30"), by = "day"))
+daysinfo$weekNum <- wday(daysinfo$Date, week_start = 1)
+daysinfo$isFirstSunday <- wday(daysinfo$Date, week_start = 1) == 7 & day(daysinfo$Date) <= 7
+```
+
+```{r echo=FALSE, fig.width=10}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_vline(xintercept = seq(as.Date("2016-01-01"), length = 13, by = "month"), col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "indianred", lty = 3) +
+  geom_line(size = 0.5, col = "grey") +
+  geom_point(size = 0.5, col = "grey15") +
+  geom_point(data = asianart_visitors[wday(Date, week_start = 1) == 7, .(Date, visitors)], aes(Date, visitors), size = 0.5, col = "red") +
+  #geom_line(data = movingAverage(asianart_subset), aes(Date, visitors), size = 0.5, col = "blue") +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits - 2016") +
+  coord_cartesian(xlim = as.Date(c("2016-01-01", "2016-12-31")))
+```
+
+```{r echo=FALSE, fig.width=10}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_vline(xintercept = seq(as.Date("2017-01-01"), length = 13, by = "month"), col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "indianred", lty = 3) +
+  geom_line(size = 0.5, col = "grey") +
+  geom_point(size = 0.5, col = "grey15") +
+  geom_point(data = asianart_visitors[wday(Date, week_start = 1) == 7, .(Date, visitors)], aes(Date, visitors), size = 0.5, col = "red") +
+  #geom_line(data = movingAverage(asianart_subset), aes(Date, visitors), size = 0.5, col = "blue") +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits - 2017") +
+  coord_cartesian(xlim = as.Date(c("2017-01-01", "2017-12-31")))
+```
+
+```{r echo=FALSE, fig.width=10}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_vline(xintercept = seq(as.Date("2018-01-01"), length = 13, by = "month"), col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "indianred", lty = 3) +
+  geom_line(size = 0.5, col = "grey") +
+  geom_point(size = 0.5, col = "grey15") +
+  geom_point(data = asianart_visitors[wday(Date, week_start = 1) == 7, .(Date, visitors)], aes(Date, visitors), size = 0.5, col = "red") +
+  #geom_line(data = movingAverage(asianart_subset), aes(Date, visitors), size = 0.5, col = "blue") +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits - 2018") +
+  coord_cartesian(xlim = as.Date(c("2018-01-01", "2018-12-31")))
+```
+
+```{r echo=FALSE, fig.width=10}
+
+```
+
+```{r echo=FALSE, fig.width=10}
+
+```

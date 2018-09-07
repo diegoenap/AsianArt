@@ -1,0 +1,596 @@
+---
+title: "Asian Art Museum - Google Analytics metrics"
+author: "Diego Enriquez"
+date: "9/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+suppressMessages(library(data.table))
+suppressMessages(library(lubridate))
+suppressMessages(library(ggplot2))
+suppressMessages(library(grid))
+
+# Functions ==================================================================================================================================
+source("asianart_func.R")
+```
+
+# Tickets
+```{r echo=FALSE, warning=FALSE}
+ga_tickets_nochn_all <- readQueryExplorerData("data/ga/asian_allws_nochn_all.tsv", c("Date"))
+ga_tickets_nochn_os <- readQueryExplorerData("data/ga/asian_allws_nochn_os.tsv", c("Date"))
+ga_tickets_nochn_us <- readQueryExplorerData("data/ga/asian_allws_nochn_us.tsv", c("Date"))
+ga_tickets_nochn_do <- readQueryExplorerData("data/ga/asian_allws_nochn_do.tsv", c("Date"))
+ga_tickets_nochn_lo <- readQueryExplorerData("data/ga/asian_allws_nochn_lo.tsv", c("Date"))
+
+ga_tickets_chn_all <- readQueryExplorerData("data/ga/asian_allws_chn_all.tsv", c("Date", "Channel"))
+ga_tickets_chn_os <- readQueryExplorerData("data/ga/asian_allws_chn_os.tsv", c("Date", "Channel"))
+ga_tickets_chn_us <- readQueryExplorerData("data/ga/asian_allws_chn_us.tsv", c("Date", "Channel"))
+ga_tickets_chn_do <- readQueryExplorerData("data/ga/asian_allws_chn_do.tsv", c("Date", "Channel"))
+ga_tickets_chn_lo <- readQueryExplorerData("data/ga/asian_allws_chn_lo.tsv", c("Date", "Channel"))
+
+daysinfo <- data.table(Date = seq(as.Date("2016-01-01"), as.Date("2018-06-30"), by = "day"))
+daysinfo$weekNum <- wday(daysinfo$Date, week_start = 1)
+daysinfo$isFirstSunday <- wday(daysinfo$Date, week_start = 1) == 7 & day(daysinfo$Date) <= 7
+
+lim <- c("2016-07-06", "2018-06-30")
+```
+
+
+## All locations
+
+```{r ga_tickets_nochn_all, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_nochn_all, limitDates = lim)  # or,
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### (Other)
+
+'(Other)', 'Direct', 'Display', 'Email', 'Organic Search', 'Paid Search', 'Referral', 'Social'
+
+```{r ga_tickets_chn_all_1, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "(Other)"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Direct
+
+```{r ga_tickets_chn_all_2, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Direct"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Display
+
+```{r ga_tickets_chn_all_3, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Display"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Email
+
+```{r ga_tickets_chn_all_4, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Email"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Organic Search
+
+```{r ga_tickets_chn_all_5, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Organic Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Paid Search
+
+```{r ga_tickets_chn_all_6, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Paid Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Referral
+
+```{r ga_tickets_chn_all_7, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Referral"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Social
+
+```{r ga_tickets_chn_all_8, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_all[Channel == "Social"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+
+## Overseas
+
+```{r ga_tickets_nochn_os, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_nochn_os, limitDates = lim)  # or,
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### (Other)
+
+'(Other)', 'Direct', 'Display', 'Email', 'Organic Search', 'Paid Search', 'Referral', 'Social'
+
+```{r ga_tickets_chn_os_1, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "(Other)"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Direct
+
+```{r ga_tickets_chn_os_2, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Direct"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Display
+
+```{r ga_tickets_chn_os_3, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Display"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Email
+
+```{r ga_tickets_chn_os_4, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Email"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Organic Search
+
+```{r ga_tickets_chn_os_5, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Organic Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Paid Search
+
+```{r ga_tickets_chn_os_6, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Paid Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Referral
+
+```{r ga_tickets_chn_os_7, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Referral"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Social
+
+```{r ga_tickets_chn_os_8, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_os[Channel == "Social"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+
+## United States
+
+```{r ga_tickets_nochn_us, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_nochn_us, limitDates = lim)  # or,
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### (Other)
+
+'(Other)', 'Direct', 'Display', 'Email', 'Organic Search', 'Paid Search', 'Referral', 'Social'
+
+```{r ga_tickets_chn_us_1, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "(Other)"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Direct
+
+```{r ga_tickets_chn_us_2, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Direct"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Display
+
+```{r ga_tickets_chn_us_3, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Display"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Email
+
+```{r ga_tickets_chn_us_4, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Email"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Organic Search
+
+```{r ga_tickets_chn_us_5, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Organic Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Paid Search
+
+```{r ga_tickets_chn_us_6, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Paid Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Referral
+
+```{r ga_tickets_chn_us_7, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Referral"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Social
+
+```{r ga_tickets_chn_us_8, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_us[Channel == "Social"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+
+## Domestics
+
+```{r ga_tickets_nochn_do, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_nochn_do, limitDates = lim)  # or,
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### (Other)
+
+'(Other)', 'Direct', 'Display', 'Email', 'Organic Search', 'Paid Search', 'Referral', 'Social'
+
+```{r ga_tickets_chn_do_1, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "(Other)"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Direct
+
+```{r ga_tickets_chn_do_2, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Direct"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Display
+
+```{r ga_tickets_chn_do_3, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Display"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Email
+
+```{r ga_tickets_chn_do_4, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Email"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Organic Search
+
+```{r ga_tickets_chn_do_5, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Organic Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Paid Search
+
+```{r ga_tickets_chn_do_6, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Paid Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Referral
+
+```{r ga_tickets_chn_do_7, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Referral"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Social
+
+```{r ga_tickets_chn_do_8, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_do[Channel == "Social"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+
+## Locals
+
+```{r ga_tickets_nochn_lo, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_nochn_lo, limitDates = lim)  # or,
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### (Other)
+
+'(Other)', 'Direct', 'Display', 'Email', 'Organic Search', 'Paid Search', 'Referral', 'Social'
+
+```{r ga_tickets_chn_lo_1, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "(Other)"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Direct
+
+```{r ga_tickets_chn_lo_2, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Direct"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Display
+
+```{r ga_tickets_chn_lo_3, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Display"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Email
+
+```{r ga_tickets_chn_lo_4, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Email"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Organic Search
+
+```{r ga_tickets_chn_lo_5, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Organic Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Paid Search
+
+```{r ga_tickets_chn_lo_6, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Paid Search"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Referral
+
+```{r ga_tickets_chn_lo_7, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Referral"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
+
+### Social
+
+```{r ga_tickets_chn_lo_8, echo=FALSE, fig.width=10}
+gadata <- completeGADates(ga_tickets_chn_lo[Channel == "Social"], limitDates = lim)
+plotsGA <- getPlotGAList(gadata)
+
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[1]]), ggplotGrob(plotsGA[[2]]), ggplotGrob(plotsGA[[3]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[4]]), ggplotGrob(plotsGA[[5]]), ggplotGrob(plotsGA[[6]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[7]]), ggplotGrob(plotsGA[[8]]), ggplotGrob(plotsGA[[9]]), size = "last"))
+grid.newpage(); grid.draw(rbind(ggplotGrob(plotsGA[[10]]), ggplotGrob(plotsGA[[11]]), ggplotGrob(plotsGA[[12]]), size = "last"))
+```
