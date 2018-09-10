@@ -158,3 +158,184 @@ getPlotGAList <- function(data, holidays = NULL, showTrend = TRUE, logData = FAL
   p[[12]] <- getPlotGA(data, "AvgTimeOnPage", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
   return(p)
 }
+
+
+# Correlation test functions ====
+
+metricsList <- c("Users", "UsersOld", "Sessions", "SessionsNew", "SessionsOld", "SessionsBounce", "SessionsNoBounce", "AvgSessionDuration", "Pageviews", "PageviewsSession", "UniquePageviews", "AvgTimeOnPage")
+
+logValues <- function(data) {
+  # Replace the metric's values with the log value
+  data <- data[order(Date)]
+  if (canApplyLog(data))
+    if ("visitors" %in% colnames(data)) {
+      data$visitors = log(imputeDates(data)$visitors)
+    } else {
+      data$Sessions = log(data$Sessions)
+      data$SessionsNew = log(data$SessionsNew)
+      data$SessionsOld = log(data$SessionsOld)
+      data$SessionsBounce = log(data$SessionsBounce)
+      data$SessionsNoBounce = log(data$SessionsNoBounce)
+      data$AvgSessionDuration = log(data$AvgSessionDuration)
+      data$Users = log(data$Users)
+      data$UsersOld = log(data$UsersOld)
+      data$Pageviews = log(data$Pageviews)
+      data$PageviewsSession = log(data$PageviewsSession)
+      data$UniquePageviews = log(data$UniquePageviews)
+      data$AvgTimeOnPage = log(data$AvgTimeOnPage)
+    }
+  else
+    stop("Cannot apply Log, dataset contains zeros")
+  return(data)
+}
+
+canApplyLog <- function(data) {
+  # Checks if the dataset have 0 and returns TRUE if it don't
+  if ("visitors" %in% colnames(data))
+    ans <- nrow(data[visitors == 0]) > 0
+  else
+    ans <- nrow(data[Users == 0]) > 0 | nrow(data[UsersOld == 0]) > 0 | nrow(data[Sessions == 0]) > 0 | nrow(data[SessionsNew == 0]) > 0 | nrow(data[SessionsOld == 0]) > 0 | nrow(data[SessionsBounce == 0]) > 0 | nrow(data[SessionsNoBounce == 0]) > 0 | nrow(data[AvgSessionDuration == 0]) > 0 | nrow(data[Pageviews == 0]) > 0 | nrow(data[PageviewsSession == 0]) > 0 | nrow(data[UniquePageviews == 0]) > 0 | nrow(data[AvgTimeOnPage == 0]) > 0
+  return(!ans)
+}
+
+getCorrelationMatrix <- function(gametrics, visitors, maxlag = 31) {
+  # Returns a matrix where row are the GA metrics and the column are the correlation value at each lag point (from 0 to maxlag)
+  # It keeps the GA metrics fixed and try different lags going forwards with the Visitors, that is why Visitors dataset should be larger (+ maxlag).
+  #
+  # Validations
+  if (gametrics[1, Date] != visitors[1, Date]) stop("Datasets must start with the same date")
+  if (nrow(gametrics) + maxlag > nrow(visitors)) stop("Visitor dataset must be larger, considering the extra lag dates at the end (at least 'maxlag' larger)")
+  #
+  # Initialize dataframe to store results
+  corrdf <- data.frame(Metrics = metricsList)
+  # Vector that will contain columns names for the result dataframe. Each loop adds a column name (Lag_#)
+  corrcolnames <- "Metrics"
+  # Get date range, based on the GA Metrics
+  dmin <- min(gametrics[, Date])
+  dmax <- max(gametrics[, Date])
+  # Get correlations
+  for (i in 0:maxlag) {  # For each lag
+    corrvals <- numeric(12)
+    for (j in 1:12) {  # For each metric
+      # Get correlation
+      c <- round(cor(gametrics[, get(as.character(corrdf[j, 1]))], visitors[Date >= dmin + i & Date <= dmax + i, visitors]), 3)
+      corrvals[j] <- ifelse(is.na(c), 0, c)
+    }
+    corrcolnames <- cbind(corrcolnames, paste("Lag", i, sep = "_"))  # Add column name with lag number
+    corrdf <- cbind(corrdf, corrvals)                                # Add results to dataframe
+    names(corrdf) <- corrcolnames                                    # Update column names
+  }
+  return(corrdf)
+}
+
+getMaxCorrelations <- function(corrmatrix) {
+  # Pick a correlation matrix and returns a data.table with the maximum correlation value for each GA metric and their respective lag
+  data.table(Metrics = metricsList,
+             MaxCorr = apply(corrmatrix[, -1], 1, max),
+             Lag = apply(corrmatrix[, -1], 1, which.max) - 1)
+}
+
+getMaxCorrelationsTable <- function(gametrics, visitors, tptype, maxlag = 31, tofile = NULL) {
+  # Generates multiple correlation matrices and acumulates the MaxCorrelations for different test:
+  # Normal values, impute, trends, logs, moving average, etc.
+  # Each test is associated with a number, i.e. MaxCorr1 and Lag1 correspond to "Normal values, no impute"
+  # Returns a data.table with all the tests
+  #
+  # Initialize table
+  ans <- data.table(Type = tptype,
+                    Metrics = metricsList,
+                    stringsAsFactors = FALSE)
+  #
+  # 1) GA Unchanged - Visitors Unchanged
+  co <- getCorrelationMatrix(gametrics, visitors, maxlag = maxlag)
+  comax <- getMaxCorrelations(co)
+  ans <- cbind(ans, comax[, 2:3])
+  #
+  # 2) GA Log - Visitors Unchanged
+  if (canApplyLog(gametrics)) {
+    co <- getCorrelationMatrix(logValues(gametrics), visitors, maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # 3) GA Log - Visitors Log
+  if (canApplyLog(gametrics) & canApplyLog(visitors)) {
+    co <- getCorrelationMatrix(logValues(gametrics), logValues(visitors), maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # 4) GA Moving average - Visitors Impute
+  co <- getCorrelationMatrix(movingAverage(gametrics), visitors[-(1:6)], maxlag = maxlag)
+  comax <- getMaxCorrelations(co)
+  ans <- cbind(ans, comax[, 2:3])
+  #
+  # 5) GA Moving average - Visitors Moving average
+  co <- getCorrelationMatrix(movingAverage(gametrics), movingAverage(visitors), maxlag = maxlag)
+  comax <- getMaxCorrelations(co)
+  ans <- cbind(ans, comax[, 2:3])
+  #
+  # 6) GA Moving average Log - Visitors
+  if (canApplyLog(gametrics)) {
+    co <- getCorrelationMatrix(movingAverage(logValues(gametrics)), visitors[-(1:6)], maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # 7) GA Moving average Log - Visitors Moving average
+  if (canApplyLog(gametrics)) {
+    co <- getCorrelationMatrix(movingAverage(logValues(gametrics)), movingAverage(visitors), maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # 8) GA Moving average Log - Visitors Log
+  if (canApplyLog(gametrics) & canApplyLog(visitors)) {
+    co <- getCorrelationMatrix(movingAverage(logValues(gametrics)), logValues(visitors[-(1:6)]), maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # 9) GA Moving average Log - Visitors Moving average Log
+  if (canApplyLog(gametrics) & canApplyLog(visitors)) {
+    co <- getCorrelationMatrix(movingAverage(logValues(gametrics)), movingAverage(logValues(visitors)), maxlag = maxlag)
+    comax <- getMaxCorrelations(co)
+    ans <- cbind(ans, comax[, 2:3])
+  } else
+    ans <- cbind(ans, 0, 0)
+  #
+  # Change names
+  names(ans) <- c("Type", "Metrics", paste(c("MaxCorr", "Lag"), rep(1:9, each = 2), sep = ""))
+  # Max values
+  # ans <- rbind(ans,
+  #              c(c(Type = tptype, Metrics ="MaxIndex"), apply(ans[, -(1:2)], 2, which.max)),
+  #              c(c(Type = tptype, Metrics ="MaxValue"), apply(ans[, -(1:2)], 2, max)))
+  # ans[13:14, seq(4, 22, by = 2)] <- 0
+  # Return
+  return(ans)
+}
+
+getBestCorrelations <- function(mct) {
+  # Given a MaxCorrelationTable (mct) it creates a data.table with correlation and lag for a test, for each type of dataset
+  # Example, for a Full dataset of Wellington, UniquePageviews, maxcorr, at lag, test position
+  types <- unique(mct$Type)
+  ans <- data.table(Type = "", Metrics = "", Corr = 0, Lag = 0, Pos = 0)
+  for (l in types) {
+    tmp <- mct[Type == l]
+    #i <- which.max(c(as.matrix(tmp[, c(3, 5, 7, 9, 11, 13, 15, 17, 19, 21), with = FALSE])))
+    i <- which.max(c(as.matrix(tmp[, seq(3, ncol(mct), by = 2), with = FALSE])))
+    r <- (i-1) %% 12 + 1  # Row
+    c <- ((i-1) %/% 12 + 1) * 2 + 1  # Col
+    tmp <- tmp[r, c(1, 2, c, c + 1), with = FALSE]
+    tmp <- cbind(tmp, (i-1) %/% 12 + 1)  # Add the position (Indicates the type of dataset, normal, rtend, log, impute, etc.)
+    names(tmp) <- c("Type", "Metrics", "Corr", "Lag", "Pos")
+    ans <- rbind(ans, tmp)
+  }
+  return(ans[-1])
+}
+
