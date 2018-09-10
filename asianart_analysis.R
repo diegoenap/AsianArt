@@ -111,6 +111,25 @@ ggplot(asianart_visitors, aes(Date, visitors)) +
   coord_cartesian(xlim = as.Date(c("2017-01-01", "2017-12-31")), ylim = c(0, 5000))
 
 
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits - Months") +
+  coord_cartesian(xlim = as.Date(c("2017-06-15", "2017-12-31")))
+
+ggplot(ga_allws_chn_us[Channel == "Organic Search"], aes(Date, UniquePageviews)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits - Months") +
+  coord_cartesian(xlim = as.Date(c("2017-06-15", "2017-12-31")))
+
+
 
 # Correlation tests ====
 
@@ -388,3 +407,18 @@ res <- rbind(res, res01, res02, res03, res04, res05, res06, res07, res08)
 
 fwrite(res, file = "output/correlations_visit.csv")
 fwrite(getBestCorrelations(res), file = "output/best_correlations_visit.csv")
+
+
+plotLagComparisonv2(movingAverage(ga_allws_chn_us[Channel == "Organic Search"]),
+                    movingAverage(visitordata),
+                    plotstart = "2017-06-15",
+                    plotend = "2017-12-31",
+                    metric = "UniquePageviews",
+                    dlag = 1)
+
+plotLagComparisonv2(ga_allws_chn_us[Channel == "Organic Search"],
+                    visitordata,
+                    plotstart = "2017-06-15",
+                    plotend = "2017-12-31",
+                    metric = "UniquePageviews",
+                    dlag = 1)

@@ -117,49 +117,6 @@ trendValues <- function(data) {
 }
 
 
-# Plot functions ====
-
-getPlotGA <- function(gadata, gametric, holidays = NULL, showTrend = TRUE, showSH = FALSE, showWE = FALSE, showPH = FALSE, showCS = FALSE, showE = FALSE, ylimits = NULL, logData = FALSE, impDates = TRUE) {
-  #xlablimits <- as.Date(c("2015-07-01", "2018-05-31"))
-  xlablimits <- as.Date(c("2016-07-06", "2018-06-30"))
-  ylabel <- ""
-  if (logData) {
-    gadata <- logValues(gadata, impDates = impDates)
-    ylabel <- "(log)"
-  } 
-  p <- ggplot(gadata, aes_string("Date", gametric)) +
-    scale_x_date(limits = xlablimits) +
-    theme_bw()
-  if (!is.null(ylimits)) p <- p + scale_y_continuous(limits = ylimits)
-  if (showSH) p <- p + geom_vline(xintercept = holidays[SchoolHoliday == 1, Date], col = "grey90")
-  if (showWE) p <- p + geom_vline(xintercept = holidays[IsWeekend == 1, Date], col = "lightgrey", lty = 3)
-  if (showPH) p <- p + geom_vline(xintercept = holidays[PublicHoliday == 1, Date], col = "lightgrey")
-  if (showCS) p <- p + geom_vline(xintercept = holidays[CruiseShip == 1, Date], col = "lightgrey")
-  if (showE) p <- p + geom_vline(xintercept = holidays[Event == 1, Date], col = "lightgrey")
-  p <- p + geom_line(col = "grey90")
-  if (showTrend) p <- p + geom_line(data = movingAverage(gadata), aes_string("Date", gametric), col = "blue")
-  p <- p + labs(x = "", y = paste(gametric, ylabel))
-  return(p)
-}
-
-getPlotGAList <- function(data, holidays = NULL, showTrend = TRUE, logData = FALSE, impDates = TRUE) {
-  p <- vector("list", 12)
-  p[[1]] <- getPlotGA(data, "Sessions", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[2]] <- getPlotGA(data, "SessionsNew", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[3]] <- getPlotGA(data, "SessionsOld", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[4]] <- getPlotGA(data, "SessionsBounce", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[5]] <- getPlotGA(data, "SessionsNoBounce", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[6]] <- getPlotGA(data, "AvgSessionDuration", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[7]] <- getPlotGA(data, "Users", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[8]] <- getPlotGA(data, "UsersOld", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[9]] <- getPlotGA(data, "Pageviews", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[10]] <- getPlotGA(data, "PageviewsSession", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[11]] <- getPlotGA(data, "UniquePageviews", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  p[[12]] <- getPlotGA(data, "AvgTimeOnPage", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
-  return(p)
-}
-
-
 # Correlation test functions ====
 
 metricsList <- c("Users", "UsersOld", "Sessions", "SessionsNew", "SessionsOld", "SessionsBounce", "SessionsNoBounce", "AvgSessionDuration", "Pageviews", "PageviewsSession", "UniquePageviews", "AvgTimeOnPage")
@@ -339,3 +296,200 @@ getBestCorrelations <- function(mct) {
   return(ans[-1])
 }
 
+
+# Plot functions ====
+
+getPlotGA <- function(gadata, gametric, holidays = NULL, showTrend = TRUE, showSH = FALSE, showWE = FALSE, showPH = FALSE, showCS = FALSE, showE = FALSE, ylimits = NULL, logData = FALSE, impDates = TRUE) {
+  #xlablimits <- as.Date(c("2015-07-01", "2018-05-31"))
+  xlablimits <- as.Date(c("2016-07-06", "2018-06-30"))
+  ylabel <- ""
+  if (logData) {
+    gadata <- logValues(gadata, impDates = impDates)
+    ylabel <- "(log)"
+  } 
+  p <- ggplot(gadata, aes_string("Date", gametric)) +
+    scale_x_date(limits = xlablimits) +
+    theme_bw()
+  if (!is.null(ylimits)) p <- p + scale_y_continuous(limits = ylimits)
+  if (showSH) p <- p + geom_vline(xintercept = holidays[SchoolHoliday == 1, Date], col = "grey90")
+  if (showWE) p <- p + geom_vline(xintercept = holidays[IsWeekend == 1, Date], col = "lightgrey", lty = 3)
+  if (showPH) p <- p + geom_vline(xintercept = holidays[PublicHoliday == 1, Date], col = "lightgrey")
+  if (showCS) p <- p + geom_vline(xintercept = holidays[CruiseShip == 1, Date], col = "lightgrey")
+  if (showE) p <- p + geom_vline(xintercept = holidays[Event == 1, Date], col = "lightgrey")
+  p <- p + geom_line(col = "grey90")
+  if (showTrend) p <- p + geom_line(data = movingAverage(gadata), aes_string("Date", gametric), col = "blue")
+  p <- p + labs(x = "", y = paste(gametric, ylabel))
+  return(p)
+}
+
+getPlotGAList <- function(data, holidays = NULL, showTrend = TRUE, logData = FALSE, impDates = TRUE) {
+  p <- vector("list", 12)
+  p[[1]] <- getPlotGA(data, "Sessions", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[2]] <- getPlotGA(data, "SessionsNew", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[3]] <- getPlotGA(data, "SessionsOld", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[4]] <- getPlotGA(data, "SessionsBounce", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[5]] <- getPlotGA(data, "SessionsNoBounce", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[6]] <- getPlotGA(data, "AvgSessionDuration", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[7]] <- getPlotGA(data, "Users", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[8]] <- getPlotGA(data, "UsersOld", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[9]] <- getPlotGA(data, "Pageviews", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[10]] <- getPlotGA(data, "PageviewsSession", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[11]] <- getPlotGA(data, "UniquePageviews", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  p[[12]] <- getPlotGA(data, "AvgTimeOnPage", holidays, showTrend = showTrend, showSH = FALSE, logData = logData, impDates = impDates)
+  return(p)
+}
+
+
+plotCorrelations <- function(corrmatrix, select = NULL, plottitle = "Correlations") {
+  require(ggplot2)
+  tmp <- data.frame(Metrics = factor(rep(corrmatrix$Metric, each = ncol(corrmatrix)-1), levels = c("Users", "UsersOld", "Sessions", "SessionsNew", "SessionsOld", "SessionsBounce", "SessionsNoBounce", "AvgSessionDuration", "Pageviews", "PageviewsSession", "UniquePageviews", "AvgTimeOnPage")),
+                    Lag = factor(0:(ncol(corrmatrix)-2)),
+                    Corr = c(t(corrmatrix[, -1])))
+  # tmp <- data.frame(Metrics = factor(rep(corrmatrix$Metric, each = ncol(corrmatrix)-1), levels = select),
+  #                   Lag = factor(0:(ncol(corrmatrix)-2)),
+  #                   Corr = c(t(corrmatrix[, -1])))
+  #if(!is.null(select)) tmp <- tmp[tmp$Metrics %in% select, ]
+  ggplot(subset(tmp, Metrics %in% select), aes(Lag, Corr, group = 1)) +
+    geom_line(size = 0.25) +
+    geom_point(size = 1) +
+    geom_point(data = subset(getMaxCorrelations(corrmatrix), Metrics %in% select), aes(factor(Lag), MaxCorr), col = "red") +
+    geom_text(data = subset(getMaxCorrelations(corrmatrix), Metrics %in% select), aes(factor(Lag), MaxCorr, label = MaxCorr), col = "red", vjust = -0.4, hjust = -0.1) +
+    scale_y_continuous(limits = c(0, 1)) +
+    scale_x_discrete(breaks = seq(0, 30, by = 5), labels = seq(0, 30, by = 5)) +
+    facet_grid(Metrics ~ .) +
+    theme_bw() +
+    labs(title = plottitle, x = "Lag in days", y = "Correlations")# +
+  #coord_cartesian(xlim = as.Date(c("2017-01-15", "2017-06-15")))
+}
+
+plotLagComparison <- function(gametrics, visitors, metric = NULL, dlag = NULL, maxcorrs = NULL, showboth = TRUE, plottitle = "Lag visualization") {
+  corrval <- ""
+  if (!is.null(maxcorrs)) {
+    metric <- as.character(maxcorrs[which.max(maxcorrs$MaxCorr), 1])
+    dlag <- as.integer(maxcorrs[which.max(maxcorrs$MaxCorr), 3])
+    corrval <- round(max(maxcorrs$MaxCorr), 3)
+  } else {
+    if (is.null(metric) || is.null(dlag)) stop("You need to provide metric and lag if matrix of maximum values is not provided")
+  }
+  xlablimits <- c(min(c(gametrics$Date, visitors$Date)), max(c(gametrics$Date, visitors$Date)))
+  
+  if (showboth){
+    pvis <- ggplot() +
+      geom_line(data = visitors, aes_string("Date", "visitors"), col = "red", lty = 1) +
+      geom_line(data = visitors[, .(Date = Date - dlag, visitors)], aes_string("Date", "visitors"), col = "grey", lty = 2) +
+      scale_x_date(limits = xlablimits) +
+      theme_bw() +
+      theme(axis.text.y = element_text(angle = 90, hjust = 0.5), axis.text.x = element_text(angle = 0, hjust = 1))+
+      #labs(title = plottitle, x = "")
+      labs(title = "", x = "", y = "Asian Art Visitors")
+  } else {
+    pvis <- ggplot() +
+      #geom_line(data = visitors, aes_string("Date", "visitors"), col = "red", lty = 1) +
+      geom_line(data = visitors[, .(Date = Date - dlag, visitors)], aes_string("Date", "visitors"), col = "red", lty = 1) +
+      scale_x_date(limits = xlablimits) +
+      theme_bw() +
+      theme(axis.text.y = element_text(angle = 90, hjust = 0.5), axis.text.x = element_text(angle = 0, hjust = 1))+
+      #labs(title = plottitle, x = "")
+      labs(title = "", x = "", y = "Asian Art Visitors")
+  }
+  
+  pgam <- ggplot(gametrics, aes_string("Date", metric)) +
+    geom_line(col = "blue") +
+    scale_x_date(limits = xlablimits) +
+    theme_bw() +
+    theme(axis.text.y = element_text(angle = 90, hjust = 0.5), axis.text.x = element_text(angle = 0, hjust = 1))+
+    #labs(x = "", caption = paste("Lag =", dlag, ", Correlation value =", corrval))
+    labs(x = "")
+  
+  grid.newpage()
+  grid.draw(rbind(ggplotGrob(pvis), ggplotGrob(pgam), size = "last"))
+}
+
+plotLagComparisonv2 <- function(gametrics, visitors, plotstart, plotend, metric = NULL, dlag = NULL, plottitle = "Lag visualization") {
+  # It receives the complete datasets and plot the range.
+  # corrval <- ""
+  # if (!is.null(maxcorrs)) {
+  #   metric <- as.character(maxcorrs[which.max(maxcorrs$MaxCorr), 1])
+  #   dlag <- as.integer(maxcorrs[which.max(maxcorrs$MaxCorr), 3])
+  #   corrval <- round(max(maxcorrs$MaxCorr), 3)
+  # } else {
+  #   if (is.null(metric) || is.null(dlag)) stop("You need to provide metric and lag if matrix of maximum values is not provided")
+  # }
+  # xlablimits <- c(min(c(gametrics$Date, visitors$Date)), max(c(gametrics$Date, visitors$Date)))
+  
+  if (is.null(dlag)){
+    # Do not show lag
+    pvis <- ggplot() +
+      geom_line(data = visitors[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "red", lty = 1) +
+      #geom_line(data = visitors[, .(Date = Date - dlag, visitors)], aes_string("Date", "visitors"), col = "grey", lty = 2) +
+      #scale_x_date(limits = xlablimits) +
+      theme_bw() +
+      theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
+      #labs(title = plottitle, x = "")
+      labs(title = "", x = "")
+  } else {
+    visitors_lag <- visitors
+    visitors_lag$Date <- visitors$Date - dlag
+    pvis <- ggplot() +
+      #geom_line(data = visitors, aes_string("Date", "visitors"), col = "red", lty = 1) +
+      geom_line(data = visitors[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "red", lty = 1) +
+      geom_line(data = visitors_lag[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "grey", lty = 2) +
+      #scale_x_date(limits = xlablimits) +
+      theme_bw() +
+      theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
+      #labs(title = plottitle, x = "")
+      labs(title = "", x = "")
+  }
+  
+  pgam <- ggplot(gametrics[Date >= plotstart & Date <= plotend], aes_string("Date", metric)) +
+    geom_line(col = "blue") +
+    #scale_x_date(limits = xlablimits) +
+    theme_bw() +
+    #theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
+    labs(x = "")
+  
+  grid.newpage()
+  grid.draw(rbind(ggplotGrob(pvis), ggplotGrob(pgam), size = "last"))
+}
+
+plotLagComparisonSameSacle <- function(gametrics, visitors, metric = NULL, dlag = 0) {
+  # Plot both datasets in the same scale
+  gametricslag <- gametrics
+  gametricslag$Date <- gametrics$Date + dlag
+  # Set same lenght
+  gametricslag <- gametricslag[Date >= "2016-07-06" & Date <= "2018-06-30"]
+  visitorslag <- visitors[Date >= "2016-07-06" & Date <= "2018-06-30"]
+  
+  finalplot <- ggplot() +
+    geom_line(data = visitorslag, aes(Date, (visitors / mean(visitorslag$visitors))), col = "red", size = 0.5)
+  
+  if (is.null(metric))
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (Sessions / mean(gametricslag$Sessions))), col = "blue", size = 0.5) + labs(x = "", y = "Sessions / Asian Art Visitors")
+  else if (metric == "Sessions")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (Sessions / mean(gametricslag$Sessions))), col = "blue", size = 0.5) + labs(x = "", y = "Sessions / Asian Art Visitors")
+  else if (metric == "SessionsNew")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (SessionsNew / mean(gametricslag$SessionsNew))), col = "blue", size = 0.5) + labs(x = "", y = "SessionsNew / Asian Art Visitors")
+  else if (metric == "SessionsOld")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (SessionsOld / mean(gametricslag$SessionsOld))), col = "blue", size = 0.5) + labs(x = "", y = "SessionsOld / Asian Art Visitors")
+  else if (metric == "SessionsBounce")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (SessionsBounce / mean(gametricslag$SessionsBounce))), col = "blue", size = 0.5) + labs(x = "", y = "SessionsBounce / Asian Art Visitors")
+  else if (metric == "SessionsNoBounce")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (SessionsNoBounce / mean(gametricslag$SessionsNoBounce))), col = "blue", size = 0.5) + labs(x = "", y = "SessionsNoBounce / Asian Art Visitors")
+  else if (metric == "AvgSessionDuration")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (AvgSessionDuration / mean(gametricslag$AvgSessionDuration))), col = "blue", size = 0.5) + labs(x = "", y = "AvgSessionDuration / Asian Art Visitors")
+  else if (metric == "Users")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (Users / mean(gametricslag$Users))), col = "blue", size = 0.5) + labs(x = "", y = "Users / Asian Art Visitors")
+  else if (metric == "UsersOld")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (UsersOld / mean(gametricslag$UsersOld))), col = "blue", size = 0.5) + labs(x = "", y = "UsersOld / Asian Art Visitors")
+  else if (metric == "Pageviews")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (Pageviews / mean(gametricslag$Pageviews))), col = "blue", size = 0.5) + labs(x = "", y = "Pageviews / Asian Art Visitors")
+  else if (metric == "PageviewsSession")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (PageviewsSession / mean(gametricslag$PageviewsSession))), col = "blue", size = 0.5) + labs(x = "", y = "PageviewsSession / Asian Art Visitors")
+  else if (metric == "UniquePageviews")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (UniquePageviews / mean(gametricslag$UniquePageviews))), col = "blue", size = 0.5) + labs(x = "", y = "UniquePageviews / Asian Art Visitors")
+  else if (metric == "AvgTimeOnPage")
+    finalplot <- finalplot + geom_line(data = gametricslag, aes(Date, (AvgTimeOnPage / mean(gametricslag$AvgTimeOnPage))), col = "blue", size = 0.5) + labs(x = "", y = "AvgTimeOnPage / Asian Art Visitors")
+  
+  finalplot <- finalplot + theme_bw()
+  return(finalplot)
+}
