@@ -147,9 +147,11 @@ plotLagComparison(ga_allws_chn_us[Channel == "Organic Search" & Date >= teststar
                     dlag = 1)
 ```
 
-#### Without moving average, zoom to Jun - Dec 2017, lag 0
+#### Without moving average, zoom 
 
 Lightblue lines show Sundays, Red lines show first Sundays each month.
+
+#### Zoom Jul 2016 - Dec 2016, lag 0
 
 ```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
 ggplot(asianart_visitors, aes(Date, visitors)) +
@@ -159,7 +161,7 @@ ggplot(asianart_visitors, aes(Date, visitors)) +
   geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
   theme_bw() +
   labs(title = "Asian Art Museum visits") +
-  coord_cartesian(xlim = as.Date(c("2017-06-15", "2017-12-31")))
+  coord_cartesian(xlim = as.Date(c("2016-07-06", "2017-01-10")))
 ```
 
 ```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
@@ -170,8 +172,81 @@ ggplot(ga_allws_chn_us[Channel == "Organic Search"], aes(Date, UniquePageviews))
   geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
   theme_bw() +
   labs(title = "Asian Art Museum GA metric") +
-  coord_cartesian(xlim = as.Date(c("2017-06-15", "2017-12-31")))
+  coord_cartesian(xlim = as.Date(c("2016-07-06", "2017-01-10")))
 ```
+
+#### Zoom Jan 2017 - Jun 2017, lag 0
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits") +
+  coord_cartesian(xlim = as.Date(c("2017-01-01", "2017-07-15")))
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(ga_allws_chn_us[Channel == "Organic Search"], aes(Date, UniquePageviews)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum GA metric") +
+  coord_cartesian(xlim = as.Date(c("2017-01-01", "2017-07-15")))
+```
+
+#### Zoom Jun 2017 - Dec 2017, lag 0
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits") +
+  coord_cartesian(xlim = as.Date(c("2017-07-01", "2018-01-10")))
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(ga_allws_chn_us[Channel == "Organic Search"], aes(Date, UniquePageviews)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum GA metric") +
+  coord_cartesian(xlim = as.Date(c("2017-07-01", "2018-01-10")))
+```
+
+#### Zoom Jan 2018 - Jun 2018, lag 0
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(asianart_visitors, aes(Date, visitors)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum visits") +
+  coord_cartesian(xlim = as.Date(c("2018-01-01", "2018-06-30")))
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=2.5, warning=FALSE}
+ggplot(ga_allws_chn_us[Channel == "Organic Search"], aes(Date, UniquePageviews)) +
+  geom_line(size = 0.5, col = "grey40") +
+  #geom_line(data = movingAverage(asianart_visitors), aes(Date, visitors), size = 0.5, col = "blue") +
+  geom_vline(xintercept = daysinfo[weekNum == 7, Date], col = "lightblue", lty = 2) +
+  geom_vline(xintercept = daysinfo[isFirstSunday == TRUE, Date], col = "red", lty = 2) +
+  theme_bw() +
+  labs(title = "Asian Art Museum GA metric") +
+  coord_cartesian(xlim = as.Date(c("2018-01-01", "2018-06-30")))
+```
+
 
 #### All locations, Organic Search, UniquePageviews, corr: 0.830
 

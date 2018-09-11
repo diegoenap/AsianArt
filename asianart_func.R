@@ -185,6 +185,36 @@ getCorrelationMatrix <- function(gametrics, visitors, maxlag = 31) {
   return(corrdf)
 }
 
+getCorrelationMatrixv2 <- function(gametrics, visitors, maxlag = 31) {
+  # Returns a matrix where row are the GA metrics and the column are the correlation value at each lag point (from 0 to maxlag)
+  # It keeps the visitors fixed and try different lags going backwards with the GA metrics, that is why GA metrics dataset should be larger (+ maxlag).
+  #
+  # Validations
+  if (last(gametrics)[, Date] != last(visitors)[, Date]) stop("Datasets must end with the same date")
+  if (nrow(visitors) + maxlag > nrow(gametrics)) stop("GA metrics dataset must be larger, considering the extra lag dates at the begining (at least 'maxlag' larger)")
+  #
+  # Initialize dataframe to store results
+  corrdf <- data.frame(Metrics = metricsList)
+  # Vector that will contain columns names for the result dataframe. Each loop adds a column name (Lag_#)
+  corrcolnames <- "Metrics"
+  # Get date range, based on the Visitors
+  dmin <- min(visitors[, Date])
+  dmax <- max(visitors[, Date])
+  # Get correlations
+  for (i in 0:maxlag) {  # For each lag
+    corrvals <- numeric(12) 
+    for (j in 1:12) { # For each metric
+      # Get correlation
+      # corrvals[j] <- round(cor(gametrics[, get(as.character(corrdf[j, 1]))], visitors[Date >= dmin + i & Date <= dmax + i, visitors]), 3)
+      corrvals[j] <- round(cor(visitors[, visitors], gametrics[Date >= dmin - i & Date <= dmax - i, get(as.character(corrdf[j, 1]))]), 3)
+    }
+    corrcolnames <- cbind(corrcolnames, paste("Lag", i, sep = "_"))  # Add column name with lag number
+    corrdf <- cbind(corrdf, corrvals)                                # Add results to dataframe
+    names(corrdf) <- corrcolnames                                    # Update column names
+  }
+  return(corrdf)
+}
+
 getMaxCorrelations <- function(corrmatrix) {
   # Pick a correlation matrix and returns a data.table with the maximum correlation value for each GA metric and their respective lag
   data.table(Metrics = metricsList,
@@ -363,6 +393,8 @@ plotCorrelations <- function(corrmatrix, select = NULL, plottitle = "Correlation
 }
 
 plotLagComparison <- function(gametrics, visitors, metric = NULL, dlag = NULL, maxcorrs = NULL, showboth = TRUE, plottitle = "Lag visualization") {
+  # Shows two plots to compare the correlations. On the top it shows the visitors and on the bottom the GA metrics
+  # specify by "metric"
   corrval <- ""
   if (!is.null(maxcorrs)) {
     metric <- as.character(maxcorrs[which.max(maxcorrs$MaxCorr), 1])
@@ -406,6 +438,10 @@ plotLagComparison <- function(gametrics, visitors, metric = NULL, dlag = NULL, m
 }
 
 plotLagComparisonv2 <- function(gametrics, visitors, plotstart, plotend, metric = NULL, dlag = NULL, plottitle = "Lag visualization") {
+  # Shows two plots to compare the correlations. On the top it shows the visitors and on the bottom the GA metrics
+  # specify by "metric".
+  # It is the same as plotLagComparisonv2 but uses the parameters plotstart, plotend to show a specific portion.
+  #
   # It receives the complete datasets and plot the range.
   # corrval <- ""
   # if (!is.null(maxcorrs)) {
@@ -415,14 +451,14 @@ plotLagComparisonv2 <- function(gametrics, visitors, plotstart, plotend, metric 
   # } else {
   #   if (is.null(metric) || is.null(dlag)) stop("You need to provide metric and lag if matrix of maximum values is not provided")
   # }
-  # xlablimits <- c(min(c(gametrics$Date, visitors$Date)), max(c(gametrics$Date, visitors$Date)))
+  xlablimits <- c(as.Date(plotstart), as.Date(plotend))
   
   if (is.null(dlag)){
     # Do not show lag
     pvis <- ggplot() +
       geom_line(data = visitors[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "red", lty = 1) +
       #geom_line(data = visitors[, .(Date = Date - dlag, visitors)], aes_string("Date", "visitors"), col = "grey", lty = 2) +
-      #scale_x_date(limits = xlablimits) +
+      scale_x_date(limits = xlablimits) +
       theme_bw() +
       theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
       #labs(title = plottitle, x = "")
@@ -434,7 +470,7 @@ plotLagComparisonv2 <- function(gametrics, visitors, plotstart, plotend, metric 
       #geom_line(data = visitors, aes_string("Date", "visitors"), col = "red", lty = 1) +
       geom_line(data = visitors[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "red", lty = 1) +
       geom_line(data = visitors_lag[Date >= plotstart & Date <= plotend], aes_string("Date", "visitors"), col = "grey", lty = 2) +
-      #scale_x_date(limits = xlablimits) +
+      scale_x_date(limits = xlablimits) +
       theme_bw() +
       theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
       #labs(title = plottitle, x = "")
@@ -443,7 +479,7 @@ plotLagComparisonv2 <- function(gametrics, visitors, plotstart, plotend, metric 
   
   pgam <- ggplot(gametrics[Date >= plotstart & Date <= plotend], aes_string("Date", metric)) +
     geom_line(col = "blue") +
-    #scale_x_date(limits = xlablimits) +
+    scale_x_date(limits = xlablimits) +
     theme_bw() +
     #theme(axis.text.y = element_text(angle = 90, hjust = 0.5))+
     labs(x = "")

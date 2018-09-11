@@ -1,0 +1,759 @@
+---
+title: "Asian Art Museum - Periods"
+author: "Diego Enriquez"
+date: "9/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+suppressMessages(library(data.table))
+suppressMessages(library(lubridate))
+suppressMessages(library(ggplot2))
+suppressMessages(library(grid))
+
+# Functions ==================================================================================================================================
+source("asianart_func.R")
+```
+
+
+```{r echo=FALSE, warning=FALSE}
+asianart_visitors <- readVisitorData()
+asianart_visitors <- asianart_visitors[Date >= "2016-01-01"]
+```
+
+```{r echo=FALSE, warning=FALSE}
+ga_allws_nochn_all <- readQueryExplorerData("data/ga/asian_allws_nochn_all.tsv", c("Date"))
+ga_allws_nochn_os <- readQueryExplorerData("data/ga/asian_allws_nochn_os.tsv", c("Date"))
+ga_allws_nochn_us <- readQueryExplorerData("data/ga/asian_allws_nochn_us.tsv", c("Date"))
+ga_allws_nochn_do <- readQueryExplorerData("data/ga/asian_allws_nochn_do.tsv", c("Date"))
+ga_allws_nochn_lo <- readQueryExplorerData("data/ga/asian_allws_nochn_lo.tsv", c("Date"))
+
+ga_allws_chn_all <- readQueryExplorerData("data/ga/asian_allws_chn_all.tsv", c("Date", "Channel"))
+ga_allws_chn_os <- readQueryExplorerData("data/ga/asian_allws_chn_os.tsv", c("Date", "Channel"))
+ga_allws_chn_us <- readQueryExplorerData("data/ga/asian_allws_chn_us.tsv", c("Date", "Channel"))
+ga_allws_chn_do <- readQueryExplorerData("data/ga/asian_allws_chn_do.tsv", c("Date", "Channel"))
+ga_allws_chn_lo <- readQueryExplorerData("data/ga/asian_allws_chn_lo.tsv", c("Date", "Channel"))
+
+ga_plan_nochn_all <- readQueryExplorerData("data/ga/asian_plan_nochn_all.tsv", c("Date"))
+ga_plan_nochn_os <- readQueryExplorerData("data/ga/asian_plan_nochn_os.tsv", c("Date"))
+ga_plan_nochn_us <- readQueryExplorerData("data/ga/asian_plan_nochn_us.tsv", c("Date"))
+ga_plan_nochn_do <- readQueryExplorerData("data/ga/asian_plan_nochn_do.tsv", c("Date"))
+ga_plan_nochn_lo <- readQueryExplorerData("data/ga/asian_plan_nochn_lo.tsv", c("Date"))
+
+ga_plan_chn_all <- readQueryExplorerData("data/ga/asian_plan_chn_all.tsv", c("Date", "Channel"))
+ga_plan_chn_os <- readQueryExplorerData("data/ga/asian_plan_chn_os.tsv", c("Date", "Channel"))
+ga_plan_chn_us <- readQueryExplorerData("data/ga/asian_plan_chn_us.tsv", c("Date", "Channel"))
+ga_plan_chn_do <- readQueryExplorerData("data/ga/asian_plan_chn_do.tsv", c("Date", "Channel"))
+ga_plan_chn_lo <- readQueryExplorerData("data/ga/asian_plan_chn_lo.tsv", c("Date", "Channel"))
+
+ga_tickets_nochn_all <- readQueryExplorerData("data/ga/asian_tickets_nochn_all.tsv", c("Date"))
+ga_tickets_nochn_os <- readQueryExplorerData("data/ga/asian_tickets_nochn_os.tsv", c("Date"))
+ga_tickets_nochn_us <- readQueryExplorerData("data/ga/asian_tickets_nochn_us.tsv", c("Date"))
+ga_tickets_nochn_do <- readQueryExplorerData("data/ga/asian_tickets_nochn_do.tsv", c("Date"))
+ga_tickets_nochn_lo <- readQueryExplorerData("data/ga/asian_tickets_nochn_lo.tsv", c("Date"))
+
+ga_tickets_chn_all <- readQueryExplorerData("data/ga/asian_tickets_chn_all.tsv", c("Date", "Channel"))
+ga_tickets_chn_os <- readQueryExplorerData("data/ga/asian_tickets_chn_os.tsv", c("Date", "Channel"))
+ga_tickets_chn_us <- readQueryExplorerData("data/ga/asian_tickets_chn_us.tsv", c("Date", "Channel"))
+ga_tickets_chn_do <- readQueryExplorerData("data/ga/asian_tickets_chn_do.tsv", c("Date", "Channel"))
+ga_tickets_chn_lo <- readQueryExplorerData("data/ga/asian_tickets_chn_lo.tsv", c("Date", "Channel"))
+
+ga_visit_nochn_all <- readQueryExplorerData("data/ga/asian_visit_nochn_all.tsv", c("Date"))
+ga_visit_nochn_os <- readQueryExplorerData("data/ga/asian_visit_nochn_os.tsv", c("Date"))
+ga_visit_nochn_us <- readQueryExplorerData("data/ga/asian_visit_nochn_us.tsv", c("Date"))
+ga_visit_nochn_do <- readQueryExplorerData("data/ga/asian_visit_nochn_do.tsv", c("Date"))
+ga_visit_nochn_lo <- readQueryExplorerData("data/ga/asian_visit_nochn_lo.tsv", c("Date"))
+
+ga_visit_chn_all <- readQueryExplorerData("data/ga/asian_visit_chn_all.tsv", c("Date", "Channel"))
+ga_visit_chn_os <- readQueryExplorerData("data/ga/asian_visit_chn_os.tsv", c("Date", "Channel"))
+ga_visit_chn_us <- readQueryExplorerData("data/ga/asian_visit_chn_us.tsv", c("Date", "Channel"))
+ga_visit_chn_do <- readQueryExplorerData("data/ga/asian_visit_chn_do.tsv", c("Date", "Channel"))
+ga_visit_chn_lo <- readQueryExplorerData("data/ga/asian_visit_chn_lo.tsv", c("Date", "Channel"))
+
+daysinfo <- data.table(Date = seq(as.Date("2016-01-01"), as.Date("2018-06-30"), by = "day"))
+daysinfo$weekNum <- wday(daysinfo$Date, week_start = 1)
+daysinfo$isFirstSunday <- wday(daysinfo$Date, week_start = 1) == 7 & day(daysinfo$Date) <= 7
+
+teststart <- "2016-07-06"  # Values for Full Data
+testend <- "2018-05-30"  # 31 days smaller than limit 2018-06-30
+maxlag <- 31
+visitordata <- asianart_visitors[Date >= teststart & Date <= as.Date(testend) + maxlag]
+
+# Common variables
+maxlag <- 15
+metric <- "UniquePageviews"
+```
+
+## By Year
+
+### 2016
+
+```{r echo=FALSE, fig.width=10}
+# teststart <- "2016-07-21"
+# testend <- "2016-12-31"
+# 
+# visitordata <- asianart_visitors[Date >= teststart & Date <= testend]
+# gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= as.Date(teststart) - maxlag & Date <= as.Date(testend)]
+# getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+# 
+# plotLagComparisonv2(movingAverage(gamericdata),
+#                     movingAverage(visitordata),
+#                     plotstart = "2016-07-06",
+#                     plotend = "2016-12-31",
+#                     metric = metric,
+#                     dlag = 1)
+```
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-07-06"
+testend <- "2016-12-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-12-11"
+testend <- "2017-12-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-12-11"
+testend <- "2018-06-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+## By Season
+
+### Summer 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-07-06"
+testend <- "2016-08-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+### Summer 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-05-11"
+testend <- "2017-08-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Summer 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-05-11"
+testend <- "2018-06-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Autumn 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-08-11"
+testend <- "2016-11-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Autumn 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-08-11"
+testend <- "2017-11-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Winter 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-11-10"
+testend <- "2017-02-28"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Winter 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-11-10"
+testend <- "2018-02-28"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Spring 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-02-09"
+testend <- "2017-05-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Spring 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-02-09"
+testend <- "2018-05-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+## By Month
+
+### July 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-07-06"
+testend <- "2016-07-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 11)
+```
+
+### August 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-07-11"
+testend <- "2016-08-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+### September 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-08-11"
+testend <- "2016-09-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### October 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-09-10"
+testend <- "2016-10-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### November 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-10-11"
+testend <- "2016-11-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 3)
+```
+
+### December 2016
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-11-10"
+testend <- "2016-12-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### January 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2016-12-11"
+testend <- "2017-01-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### February 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-01-11"
+testend <- "2017-02-28"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+### March 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-02-08"
+testend <- "2017-03-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### April 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-03-11"
+testend <- "2017-04-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### May 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-04-10"
+testend <- "2017-05-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### June 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-05-11"
+testend <- "2017-06-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+### July 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-06-10"
+testend <- "2017-07-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### August 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-07-11"
+testend <- "2017-08-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### September 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-08-11"
+testend <- "2017-09-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### October 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-09-10"
+testend <- "2017-10-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### November 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-10-11"
+testend <- "2017-11-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### December 2017
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-11-10"
+testend <- "2017-12-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### January 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2017-12-11"
+testend <- "2018-01-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### February 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-01-11"
+testend <- "2018-02-28"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### March 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-02-08"
+testend <- "2018-03-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 3)
+```
+
+### April 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-03-11"
+testend <- "2018-04-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### May 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-04-10"
+testend <- "2018-05-31"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 3)
+```
+
+### June 2018
+
+```{r echo=FALSE, fig.width=10}
+teststart <- "2018-05-11"
+testend <- "2018-06-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
