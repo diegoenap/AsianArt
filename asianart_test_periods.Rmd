@@ -324,6 +324,183 @@ plotLagComparisonv2(movingAverage(gamericdata),
                     dlag = 1)
 ```
 
+
+## By Holidays
+
+Source: http://www.sfusd.edu/en/news/calendars/academic-calendar.html
+
+### Summer break 2016
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2016-07-06"
+teststart <- "2016-07-06"
+testend <- "2016-08-14"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+### Thanksgiving recess 2016
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2016-11-23" 
+teststart <- "2016-11-02" 
+testend <- "2016-11-27"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 10)
+```
+
+### Winter break 2016
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2016-12-17" 
+teststart <- "2016-11-26" 
+testend <- "2017-01-02"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### Spring break 2017
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2017-03-25" 
+teststart <- "2017-03-04" 
+testend <- "2017-04-02"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Summer break 2017
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2017-05-27" 
+teststart <- "2017-05-06" 
+testend <- "2017-08-20"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 1)
+```
+
+### Thanksgiving recess 2017
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2017-11-18" 
+teststart <- "2017-10-28" 
+testend <- "2017-11-26"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 15)
+```
+
+### Winter break 2017
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2017-12-22" 
+teststart <- "2017-12-01" 
+testend <- "2018-01-07"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 0)
+```
+
+### Spring break 2018
+
+```{r echo=FALSE, fig.width=10}
+#teststart <- "2018-03-24" 
+teststart <- "2018-03-03" 
+testend <- "2018-04-01"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 11)
+```
+
+### Summer break 2018
+
+```{r echo=FALSE, fig.width=10}
+#eststart <- "2018-06-06" 
+teststart <- "2018-05-16" 
+testend <- "2018-06-30"
+
+visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
+gamericdata <- ga_allws_chn_us[Channel == "Organic Search" & Date >= teststart & Date <= as.Date(testend)]
+getMaxCorrelations(getCorrelationMatrixv2(movingAverage(gamericdata), movingAverage(visitordata), maxlag = maxlag))[11,]  # 11 UniquePageviews
+
+plotLagComparisonv2(movingAverage(gamericdata),
+                    movingAverage(visitordata),
+                    plotstart = teststart,
+                    plotend = testend,
+                    metric = metric,
+                    dlag = 2)
+```
+
+
 ## By Month
 
 ### July 2016
@@ -757,3 +934,4 @@ plotLagComparisonv2(movingAverage(gamericdata),
                     metric = metric,
                     dlag = 1)
 ```
+
