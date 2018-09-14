@@ -309,7 +309,7 @@ plotLagComparisonv2(movingAverage(gamericdata),
 ### Spring 2018
 
 ```{r echo=FALSE, fig.width=10}
-teststart <- "2017-02-09"
+teststart <- "2018-02-09"
 testend <- "2018-05-31"
 
 visitordata <- asianart_visitors[Date >= as.Date(teststart) + maxlag & Date <= testend]
